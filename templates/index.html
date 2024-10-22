@@ -3,21 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olá Mundo com Flask</title>
+    <title>Super Trunfo Pokémon</title>
 </head>
 <body>
-    <h1>Pressione o botão para dizer Olá:</h1>
-    <button onclick="fetchHello()">Dizer Olá</button>
-    <p id="message"></p>
+    <h1>Super Trunfo Pokémon</h1>
+    <label for="pokemon">Escolha seu Pokémon:</label>
+    <select id="pokemon">
+        <option value="25">Pikachu</option>
+        <option value="1">Bulbasaur</option>
+        <option value="4">Charmander</option>
+        <option value="7">Squirtle</option>
+    </select>
+
+    <label for="attribute">Escolha um Atributo:</label>
+    <select id="attribute">
+        <option value="HP">HP</option>
+        <option value="ATK">ATK</option>
+        <option value="DEF">DEF</option>
+        <option value="SP ATK">SP ATK</option>
+        <option value="SP DEF">SP DEF</option>
+        <option value="SPD">SPD</option>
+    </select>
+
+    <button onclick="battle()">Batalhar!</button>
+
+    <div id="result"></div>
 
     <script>
-        function fetchHello() {
-            fetch('/hello')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('message').innerText = data;
+        function battle() {
+            const pokemonCode = document.getElementById('pokemon').value;
+            const attribute = document.getElementById('attribute').value;
+
+            fetch('/battle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pokemon_code: pokemonCode,
+                    attribute: attribute
                 })
-                .catch(error => console.error('Erro:', error));
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <h2>Batalha!</h2>
+                    <p>Seu Pokémon: ${data.player_pokemon.Nome} - ${data.chosen_attribute}: ${data.player_value}</p>
+                    <p>Oponente: ${data.opponent_pokemon.Nome} - ${data.chosen_attribute}: ${data.opponent_value}</p>
+                    <h3>${data.result}</h3>
+                `;
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+            });
         }
     </script>
 </body>
